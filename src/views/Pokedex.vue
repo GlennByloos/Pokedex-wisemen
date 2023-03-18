@@ -1,9 +1,8 @@
 <template>
-  <router-view/>
-  <!--<div class="font">
+  <div class="font">
 
-    <img src="./assets/sort-icon.png" class="sortIcon"/>
-    <img src="./assets/filter-icon.jpg" class="filterIcon"/>
+    <img src="../assets/sort-icon.png" class="sortIcon"/>
+    <img src="../assets/filter-icon.jpg" class="filterIcon"/>
 
     <h1 class="title">Pokédex</h1>
 
@@ -21,27 +20,18 @@
     </div>
     <PokémonList :pokémons="matchingNames" />
     <router-view />
-  </div>-->
-  
+
+  </div>
 </template>
 
 <script>
-import Pokedex from "./views/Pokedex.vue"
 
-export default {
-  name: "App",
-  components: { Pokedex },
-  setup() {
-  
-  }
-}
-
-/*import PokémonList from "./components/PokémonList.vue"
+import PokémonList from "../components/PokémonList.vue"
 import { ref, computed, watch } from 'vue'
 import { Namespaces } from "@vue/compiler-core"
 
 export default {
-  name: "App",
+  name: "Pokedex",
   components: { PokémonList },
   setup() {
     const pokémons = ref([])
@@ -65,13 +55,13 @@ export default {
     })
     return { pokémons, search, matchingNames }
   }
-}*/
+}
 
 </script>
 
 <style>
 
-/*.myTeam {
+.myTeam {
   background: linear-gradient(to bottom right, rgba(72,69,158,255) 0%, rgba(123,50,220,255) 100%);
   padding: 10px;
   padding-top: 40px;
@@ -123,7 +113,7 @@ export default {
 }
 
 .sortIcon {
-  width: 22px; 
+  width: 22px;
   height: auto;
   position: absolute;
   right: 15px;
@@ -134,5 +124,5 @@ export default {
   height: auto;
   position: absolute;
   right: 45px;
-}*/
+}
 </style>
