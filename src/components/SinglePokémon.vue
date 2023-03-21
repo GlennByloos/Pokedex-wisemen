@@ -3,10 +3,10 @@
   <div class="pokémon">
     <img :src="pokémon.sprites.front_default" class="pokémonImg"/>
     <div class="test">
-      <h4>{{ pokémon.name[0].toUpperCase() + pokémon.name.slice(1).toLowerCase() }}</h4>
+      <h4 style="font-weight: bold">{{ pokémon.name[0].toUpperCase() + pokémon.name.slice(1).toLowerCase() }}</h4>
       <p>Nr. {{ pokémon.id }}</p>
       <font-awesome-icon icon="fa-solid fa-chevron-right" style=" float: right; margin-right: 15px; margin-left: 7px; margin-top: 19px; height: 11px; width: auto; color: rgba(163,173,186,255);"/>
-      <div v-for="type in pokémon.types" :key="pokémon.types.slot" class="pill" :style="{background: colours[type.type.name]}">
+      <div v-for="type in pokémon.types" :key="type.slot" class="pill" :style="{background: colours[type.type.name]}">
         <span>{{ type.type.name[0].toUpperCase() + type.type.name.slice(1).toLowerCase() }}</span>
       </div>
     </div>

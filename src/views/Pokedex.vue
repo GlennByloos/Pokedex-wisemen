@@ -8,16 +8,23 @@
 
     <input type="text" placeholder="pokemon zoeken" class="searchBar" v-model="search" @input="e => search = e.target.value"/>
 
-    <div class="navbtns">
-      <div class="myTeam">
-        <router-link to="/" style="color: white; text-decoration: none; margin-bottom:0; font-size: 17px;">Mijn team</router-link>
-        <p style="color: rgba(164,146,215,255); margin : 0; padding-top:5px; font-size: 14px;">4 pokemons</p>
+    <div class="teamFavWrapper">
+      <router-link to="/">
+        <div class="myTeamWrapper">
+          <div></div><div></div>
+          <div class="teamFavTitle">Mijn team</div>
+          <div class="teamText">4 pokemons</div>
+        </div>
+      </router-link>
+      <router-link to="/">
+      <div class="myFavWrapper">
+        <div></div><div></div>
+        <div class="teamFavTitle">Favorieten</div>
+        <div class="favText">12 pokemons</div>
       </div>
-      <div class="myFavorates">
-        <router-link to="/about" style="color: white; text-decoration: none; margin-bottom:0; font-size: 17px;">Favorieten</router-link>
-        <p style="color: rgba(131,224,214,255); margin : 0; padding-top:5px; font-size: 14px;">12 pokemons</p>
-      </div>
+      </router-link>
     </div>
+
     <PokémonList :pokémons="matchingNames" />
     <router-view />
 
@@ -51,7 +58,16 @@ export default {
     load()
 
     const matchingNames = computed(() => {
-      return pokémons.value.filter((name) => name.name.includes(search.value.toLowerCase()))
+      return pokémons.value.filter((name) => {
+
+        if (isNaN(search.value) || search.value === "") {
+          return name.name.includes(search.value.toLowerCase())
+        } else if (!isNaN(search.value)) {
+          //return name.id == search.value                                        --> specific one number search
+          return name.id.toString().includes(search.value.toString()); //         --> contains number search
+        }
+
+      })
     })
     return { pokémons, search, matchingNames }
   }
@@ -61,37 +77,8 @@ export default {
 
 <style>
 
-.myTeam {
-  background: linear-gradient(to bottom right, rgba(72,69,158,255) 0%, rgba(123,50,220,255) 100%);
-  padding: 10px;
-  padding-top: 40px;
-  padding-left: 15px;
-  border-radius: 10px;
-  margin-right: 4px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  width: 50%;
-  height: 50px;
-}
-.myFavorates {
-  background: linear-gradient(to bottom right, rgba(96,203,158,255) 0%, rgba(25,208,217,255) 100%);
-  padding: 10px;
-  padding-top: 40px;
-  padding-left: 15px;
-  border-radius: 10px;
-  margin-left: 4px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  width: 50%;
-  height: 50px;
-}
-
-.navbtns {
-  display: flex;
-}
-
 .font {
-  font-family:verdana;
+  font-family:sans-serif;
   margin-left: 15px;
   margin-right: 15px;
 }
@@ -99,17 +86,22 @@ export default {
 .searchBar {
   box-sizing: border-box;
   width: 100%;
-  font-size: 17px;
+  font-size: 16px;
   border-radius: 8px;
   border: none;
   background-color: rgba(239,240,241,255);
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 8px;
+  height: 37px;
+  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 .title {
   margin-top: 50px;
+  font-size: 32px;
+  font-weight: bold;
 }
 
 .sortIcon {
@@ -117,6 +109,7 @@ export default {
   height: auto;
   position: absolute;
   right: 15px;
+  padding-top: 15px;
 }
 
 .filterIcon {
@@ -124,5 +117,47 @@ export default {
   height: auto;
   position: absolute;
   right: 45px;
+  padding-top: 15px;
 }
+
+.teamFavWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 15px;
+  grid-gap: 10px;
+}
+
+.myTeamWrapper {
+  padding: 13px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-rows: 2fr;
+  background: linear-gradient(to bottom right, rgba(72,69,158,255) 0%, rgba(123,50,220,255) 100%);
+  height: 100px;
+}
+
+.myFavWrapper {
+  padding: 13px;
+  display: grid;
+  border-radius: 8px;
+  grid-template-rows: 2fr;
+  background: linear-gradient(to bottom right, rgba(96,203,158,255) 0%, rgba(25,208,217,255) 100%);
+  height: 100px;
+}
+
+.teamFavTitle {
+  color: white;
+  font-size: 17px;
+}
+
+.teamText {
+  color: rgba(164,146,215,255);
+  font-size: 14px;
+}
+
+.favText {
+  color: rgba(131,224,214,255);
+  font-size: 14px;
+}
+
 </style>
