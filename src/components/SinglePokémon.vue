@@ -4,9 +4,11 @@
     <img :src="pokémon.sprites.front_default" class="pokémonImg"/>
     <div class="test">
       <h4 style="font-weight: bold">{{ pokémon.name[0].toUpperCase() + pokémon.name.slice(1).toLowerCase() }}</h4>
-      <p>Nr. {{ pokémon.id }}</p>
+      <p v-if="pokémon.id >= 0 && pokémon.id <= 9">Nr. 00{{ pokémon.id }}</p>
+      <p v-else-if="pokémon.id >= 10 && pokémon.id <= 99">Nr. 0{{ pokémon.id }}</p>
+      <p v-else-if="pokémon.id >= 100">Nr. {{ pokémon.id }}</p>
       <font-awesome-icon icon="fa-solid fa-chevron-right" style=" float: right; margin-right: 15px; margin-left: 7px; margin-top: 19px; height: 11px; width: auto; color: rgba(163,173,186,255);"/>
-      <div v-for="type in pokémon.types" :key="type.slot" class="pill" :style="{background: colours[type.type.name]}">
+      <div v-for="type in pokémon.types" :key="type.slot" class="pill" :style="{background: $store.state.colours[type.type.name]}">
         <span>{{ type.type.name[0].toUpperCase() + type.type.name.slice(1).toLowerCase() }}</span>
       </div>
     </div>
@@ -19,34 +21,13 @@
 export default {
   props: ["pokémon"],
   setup() {
-    const colours = {
-      normal: '#A8A77A',
-      fire: '#EE8130',
-      water: '#6390F0',
-      electric: '#F7D02C',
-      grass: '#7AC74C',
-      ice: '#96D9D6',
-      fighting: '#C22E28',
-      poison: '#A33EA1',
-      ground: '#E2BF65',
-      flying: '#A98FF3',
-      psychic: '#F95587',
-      bug: '#A6B91A',
-      rock: '#B6A136',
-      ghost: '#735797',
-      dragon: '#6F35FC',
-      dark: '#705746',
-      steel: '#B7B7CE',
-      fairy: '#D685AD',
-    };
 
-    return { colours }
   }
 }
 
 </script>
 
-<style>
+<style scoped>
 
 .pokémon {
   background-color: white;
@@ -65,10 +46,6 @@ export default {
   min-width: 72.8px;
   position: absolute;
 }
-
-/*.test {
-  position: absolute;
-}*/
 
 .test h4 {
   margin-bottom: 0; 
@@ -92,9 +69,10 @@ export default {
   float: right;
   margin-right: 6px;
   margin-top: 13px;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
   font-size: 11px;
   color: #fff;
 }
+
 </style>

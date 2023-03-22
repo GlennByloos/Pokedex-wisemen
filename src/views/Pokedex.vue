@@ -1,8 +1,10 @@
 <template>
   <div class="font">
 
-    <img src="../assets/sort-icon.png" class="sortIcon"/>
-    <img src="../assets/filter-icon.jpg" class="filterIcon"/>
+    <nav>
+      <img src="../assets/sort-icon.png" class="sortIcon"/>
+      <img src="../assets/filter-icon.jpg" class="filterIcon"/>
+    </nav>
 
     <h1 class="title">Pokédex</h1>
 
@@ -16,11 +18,11 @@
           <div class="teamText">4 pokemons</div>
         </div>
       </router-link>
-      <router-link to="/">
+      <router-link :to="{ name: 'favPokémon' }">
       <div class="myFavWrapper">
         <div></div><div></div>
         <div class="teamFavTitle">Favorieten</div>
-        <div class="favText">12 pokemons</div>
+        <div class="favText">{{ $store.getters.getLength }} pokemons</div>
       </div>
       </router-link>
     </div>
@@ -34,23 +36,27 @@
 <script>
 
 import PokémonList from "../components/PokémonList.vue"
-import { ref, computed, watch } from 'vue'
-import { Namespaces } from "@vue/compiler-core"
+import { ref, computed } from 'vue'
+import store from '../store'
 
 export default {
   name: "Pokedex",
   components: { PokémonList },
   setup() {
-    const pokémons = ref([])
-    const search = ref("")
+    const pokémons = ref([]);
+    const search = ref("");
+
+    document.body.style.backgroundColor = "white";
+    document.body.style.background = "white";
 
     const load = async () => {
       try {
-        let data = await fetch("https://stoplight.io/mocks/appwise-be/pokemon/57519009/pokemon")
+        let data = await fetch("https://stoplight.io/mocks/appwise-be/pokemon/57519009/pokemon");
         if (!data.ok) {
-          throw Error("No data available")
+          throw Error("No data available");
         }
-        pokémons.value = await data.json()
+        pokémons.value = await data.json();
+        store.commit("setPokémonList", pokémons.value);
       } catch (err) {
         console.log(err.message);
       }
@@ -61,9 +67,9 @@ export default {
       return pokémons.value.filter((name) => {
 
         if (isNaN(search.value) || search.value === "") {
-          return name.name.includes(search.value.toLowerCase())
+          return name.name.includes(search.value.toLowerCase());
         } else if (!isNaN(search.value)) {
-          //return name.id == search.value                                        --> specific one number search
+          //return name.id == search.value;                                       --> specific one number search
           return name.id.toString().includes(search.value.toString()); //         --> contains number search
         }
 
@@ -75,13 +81,7 @@ export default {
 
 </script>
 
-<style>
-
-.font {
-  font-family:sans-serif;
-  margin-left: 15px;
-  margin-right: 15px;
-}
+<style scoped>
 
 .searchBar {
   box-sizing: border-box;
@@ -119,6 +119,8 @@ export default {
   right: 45px;
   padding-top: 15px;
 }
+
+/* ----------------------- Team/Favorites buttons section ----------------------- */
 
 .teamFavWrapper {
   display: grid;
@@ -159,5 +161,7 @@ export default {
   color: rgba(131,224,214,255);
   font-size: 14px;
 }
+
+/* ----------------------- End Team/Favorites buttons section ----------------------- */
 
 </style>

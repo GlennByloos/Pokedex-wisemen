@@ -1,19 +1,27 @@
 <template>
   <div class="font">
-    <nav style="margin-top: 20px;">
+    <nav>
       <font-awesome-icon icon="fa-solid fa-chevron-left" style="color: white;"/>
-      <router-link to="/" style="text-decoration: none; color: inherit; margin-left: 5px;"><a style="color: white;">Terug</a></router-link>
-      <font-awesome-icon v-if="$store.getters.getFav" @click="$store.commit('deleteFav', pokémon.name)" icon="fa-solid fa-heart" style="float: right; margin-right: 5px; color: white; height: 20px; width: 20px;"/>
-      <font-awesome-icon v-else-if="!$store.getters.getFav" @click="$store.commit('addFav', pokémon.name)" icon="fa-regular fa-heart" style="float: right; margin-right: 5px; color: white; height: 20px; width: 20px;" />
+      <!--<router-link to="/" class="navBack"><a style="color: white;">Terug</a></router-link>-->
+      <a style="color: white;" @click="this.$router.go(-1)">Terug</a>
+      <font-awesome-icon v-if="$store.getters.getFav" @click="$store.commit('deleteFav', pokémon.name)" icon="fa-solid fa-heart" class="heartIcon"/>
+      <font-awesome-icon v-else-if="!$store.getters.getFav" @click="$store.commit('addFav', pokémon.name)" icon="fa-regular fa-heart" class="heartIcon"/>
     </nav>
 
-    <h3 style="margin-top: 10px; font-size: 32px; color: white; font-weight: bold;">{{ pokémon.name }}</h3>
+    <h3 class="whiteTitle">{{ pokémonName }}</h3>
 
-    <img :src="imageLink" style="width: 180px; height: 180px; display: block; margin-left: auto; margin-right: auto;"/>
+    <img :src="imageLink" @click="showSingle" class="hqImage"/>
     
+    <vue-easy-lightbox
+      :visible="visibleRef"
+      :imgs="imgsRef"
+      :index="indexRef"
+      @hide="onHide"
+    ></vue-easy-lightbox>
+
     <!-- ----------------------- About section ----------------------- -->
     
-    <p style="font-weight: bold; font-size: 12px; color: white; margin-bottom: 4px;">ABOUT</p>
+    <p class="sectionTitle">ABOUT</p>
 
     <div class="boxWrapper">
       <div class="aboutText">
@@ -24,10 +32,10 @@
           {{ key }}
         </div>
         <div v-if="key == 'Type' && value.length == 2">
-          <span style="background: lightseagreen" class="aboutPill">{{ value[0] }}</span> <span style="background: lightseagreen" class="aboutPill">{{ value[1] }}</span>
+          <span :style="{background: $store.state.colours[pokémon.types[1].type.name]}" class="aboutPill">{{ value[1][0].toUpperCase() + value[1].slice(1).toLowerCase() }}</span> <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
         </div>
         <div v-else-if="key == 'Type' && value.length == 1">
-          <span style="background: lightseagreen" class="aboutPill">{{ value[0] }}</span>
+          <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
         </div>
         <div v-else-if="key != 'Geslacht' && key != 'Type'" class="specsValue">
           {{ value }}
@@ -51,21 +59,23 @@
 
     <!-- ----------------------- Stats section ----------------------- -->
 
-    <p style="font-weight: bold; font-size: 12px; color: white; margin-bottom: 4px;">STATISTIEKEN</p>
+    <p class="sectionTitle">STATISTIEKEN</p>
 
     <div class="boxWrapper">
       <div v-for="(value, key) in pokémonStatsList" :key="key.value" class="statsSpecsWrapper">
-        <div class="specsKey">
+        <div class="specsKey" id="statText">
           {{ key }}
         </div>
-        <div class="specsValue">
+        <div class="specsValue" id="statNumber">
           {{ value }}
         </div>
-        <div v-if="key == 'HP' || key == 'Defense' || key == 'Speed'" class="w-full bg-gray-200 rounded-full h-1">
-          <div class="bg-red-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+        <div v-if="key == 'HP' || key == 'Defense' || key == 'Speed'" class="w-full bg-gray-200 rounded-full h-1" id="progressBar">
+          <div v-if="value < 100" class="bg-red-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+          <div v-else-if="value >= 100" class="bg-red-600 h-1 rounded-full" :style="{width: '100%'}"></div>
         </div>
-        <div v-if="key == 'Attack' || key == 'Sp. Atk' || key == 'Sp. Def'" class="w-full bg-gray-200 rounded-full h-1">
-          <div class="bg-green-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+        <div v-if="key == 'Attack' || key == 'Sp. Atk' || key == 'Sp. Def'" class="w-full bg-gray-200 rounded-full h-1" id="progressBar">
+          <div v-if="value < 100" class="bg-green-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+          <div v-else-if="value >= 100" class="bg-green-600 h-1 rounded-full" :style="{width: '100%'}"></div>
         </div>
       </div>
     </div>
@@ -74,7 +84,7 @@
 
     <!-- ----------------------- Moves section ----------------------- -->
 
-    <p style="font-weight: bold; font-size: 12px; color: white; margin-bottom: 4px;">MOVESET</p>
+    <p class="sectionTitle">MOVESET</p>
 
     <div class="boxWrapperMove">
         <div class="movesWrapper">
@@ -96,19 +106,28 @@
 <script>
 import { onMounted } from 'vue';
 import { ref } from 'vue';
-import { useStore } from 'vuex';
 import store from '../store'
+import VueEasyLightbox from 'vue-easy-lightbox'
 
 export default {
   props: ["id"],
+  components: {
+    VueEasyLightbox
+  },
   setup(props) {
-    const imageLink = ref("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + props.id + ".png")
-    const pokémon = ref([])
-    const pokémonSpecies = ref([])
-    const pokémonAbout = ref()
-    const pokémonAboutList = ref({})
-    const pokémonStatsList = ref({})
-    const pokémonMovesList = ref({})
+    const imageLink = ref("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/" + props.id + ".png");
+    const pokémon = ref([]);
+    const pokémonSpecies = ref([]);
+    const pokémonAbout = ref();
+    const pokémonId = ref();
+    const pokémonAboutList = ref({});
+    const pokémonStatsList = ref({});
+    const pokémonMovesList = ref({});
+    const pokémonName = ref();
+
+    const visibleRef = ref(false);
+    const indexRef = ref(0); // default 0
+    const imgsRef = ref([]);
 
     onMounted(async () => {
 
@@ -118,16 +137,27 @@ export default {
         let pokémonCategory = "";
         let pokémonType = [];
         let pokémonMoves = {};
-        let testArray = [];
 
         if (!data.ok) {
           throw Error("No data available");
         }
         pokémon.value = await data.json(); // pokémon api
         pokémonSpecies.value = await dataSpecies.json(); // pokémon-species api
-        pokémonAbout.value = pokémonSpecies.value.flavor_text_entries[0].flavor_text.replace(/\f?\n|\f/g, " "); //get about text
 
+        store.commit("setColor", pokémon.value.types[0].type.name);
         store.commit("setCurrentPokémon", pokémon.value.name);
+        document.body.style.backgroundColor = store.getters.getColor;
+        document.body.style.background = store.getters.getColor;
+
+        pokémonName.value = pokémon.value.name[0].toUpperCase() + pokémon.value.name.slice(1).toLowerCase();
+
+        /* ----------------------- About section ----------------------- */
+
+        for (let i = 0; i < pokémonSpecies.value.flavor_text_entries.length; i++) {
+          if(pokémonSpecies.value.flavor_text_entries[i].language.name == "en" && pokémonSpecies.value.flavor_text_entries[i].version.name == "red") {
+            pokémonAbout.value = pokémonSpecies.value.flavor_text_entries[i].flavor_text.replace(/\f?\n|\f/g, " ");
+          }
+        }
 
         for (let i = 0; i < pokémonSpecies.value.genera.length; i++) { // find category in English
           if (pokémonSpecies.value.genera[i].language.name == "en") {
@@ -136,23 +166,45 @@ export default {
           }
         }
 
-        for (let i = 0; i < pokémon.value.types.length; i++) { // find type(s) for pokémon
+        for (let i = 0; i < pokémon.value.types.length; i++) { // find type(s)
           pokémonType[i] = pokémon.value.types[i].type.name;
         }
 
-        for (let i = 0; i < pokémon.value.moves.length; i++) {
+        if (pokémon.value.id >= 0 && pokémon.value.id <= 9) { pokémonId.value = "00" + pokémon.value.id.toString() }
+        else if (pokémon.value.id >= 10 && pokémon.value.id <= 99) { pokémonId.value = "0" + pokémon.value.id.toString() }
+        else { pokémonId.value = pokémon.value.id.toString() }
+
+        pokémonAboutList.value = { // get about data
+          Type: pokémonType,
+          Nummer: pokémonId.value,
+          Hoogte: pokémon.value.height/10 + " m",
+          Gewicht: pokémon.value.weight/10 + " kg",
+          Category: pokémonCategory,
+          Geslacht: pokémonSpecies.value.gender_rate,
+          Vaardigheden: pokémon.value.abilities[0].ability.name[0].toUpperCase() + pokémon.value.abilities[0].ability.name.slice(1).toLowerCase()
+        }
+
+        /* ----------------------- End About section ----------------------- */
+
+        for (let i = 0; i < pokémon.value.moves.length; i++) { // find move(s)
           for (let j = 0; j < pokémon.value.moves[i].version_group_details.length; j++) {
-            if (pokémon.value.moves[i].version_group_details[j].version_group.name == "sword-shield" && pokémon.value.moves[i].version_group_details[j].level_learned_at != 0) {
+            if (pokémon.value.moves[i].version_group_details[j].version_group.name == /*"sword-shield"*/ "red-blue" && pokémon.value.moves[i].version_group_details[j].level_learned_at != 0) {
               pokémonMoves[pokémon.value.moves[i].move.name[0].toUpperCase() + pokémon.value.moves[i].move.name.slice(1).toLowerCase()] = pokémon.value.moves[i].version_group_details[j].level_learned_at;
             }
           }
         }
 
-        for (let i = 0; i < 4; i++) {
-          pokémonMovesList.value[Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][0]] = Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][1];
+        if (Object.keys(pokémonMoves).length < 4) { // dynamic amount move(s) amount: 1 - 4
+          for (let i = 0; i < Object.keys(pokémonMoves).length; i++) {
+            pokémonMovesList.value[Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][0]] = Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][1];
+          }
+        } else {
+          for (let i = 0; i < 4; i++) {
+            pokémonMovesList.value[Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][0]] = Object.entries(pokémonMoves).sort((a,b) => a[1]-b[1])[i][1];
+          }
         }
 
-        pokémonStatsList.value = {
+        pokémonStatsList.value = { // get specs data
           HP: pokémon.value.stats[0].base_stat,
           Attack: pokémon.value.stats[1].base_stat,
           Defense: pokémon.value.stats[2].base_stat,
@@ -161,27 +213,52 @@ export default {
           Speed: pokémon.value.stats[5].base_stat
         }
 
-        pokémonAboutList.value = { // get about specs
-          Type: pokémonType,
-          Nummer: pokémon.value.id,
-          Hoogte: pokémon.value.height/10 + " m",
-          Gewicht: pokémon.value.weight/10 + " kg",
-          Category: pokémonCategory,
-          Geslacht: pokémonSpecies.value.gender_rate,
-          Vaardigheden: pokémon.value.abilities[0].ability.name[0].toUpperCase() + pokémon.value.abilities[0].ability.name.slice(1).toLowerCase()
-        }
+        
       } catch (err) {
         console.log(err.message);
       }
     })
 
-    return { pokémon, imageLink, pokémonAbout, pokémonAboutList, pokémonStatsList, pokémonMovesList }
+    /* ----------------------- Lightbox section ----------------------- */
+
+    const onShow = () => {
+      visibleRef.value = true
+    }
+    const showSingle = () => {
+      imgsRef.value = imageLink.value
+      // or
+      // imgsRef.value  = {
+      //   title: 'this is a placeholder',
+      //   src: 'http://via.placeholder.com/350x150'
+      // }
+      onShow()
+    }
+    const showMultiple = () => {
+      imgsRef.value = [
+        'http://via.placeholder.com/350x150',
+        'http://via.placeholder.com/350x150'
+      ]
+      // or
+      // imgsRef.value = [
+      //   { title: 'test img', src: 'http://via.placeholder.com/350x150' },
+      //   'http://via.placeholder.com/350x150'
+      // ]
+      indexRef.value = 0 // index of imgList
+      onShow()
+    }
+    const onHide = () => (visibleRef.value = false)
+
+    /* ----------------------- End Lightbox section ----------------------- */
+
+    return { pokémon, imageLink, pokémonAbout, pokémonAboutList, pokémonStatsList, pokémonMovesList, visibleRef, indexRef, imgsRef, showSingle, showMultiple, onHide, pokémonName }
 
   }
 }
 </script>
 
-<style>
+<style scoped>
+
+/* ----------------------- About section ----------------------- */
 
 .aboutSpecsWrapper {
   display: grid;
@@ -190,23 +267,44 @@ export default {
   margin-top: 12px
 }
 
-.statsSpecsWrapper {
-  display: grid;
-  /*align-self: center;*/
-  grid-template-columns: 5fr 2fr 18fr;
-  justify-items: start;
-  /*margin-top: 6px*/
-  align-items: center;
-  grid-gap: 20px;
+.aboutText {
+  font-size: 14px;
+  color: black;
 }
 
-.boxWrapper {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
-  margin-bottom: 30px;
+.aboutPill {
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: white;
 }
+
+/* ----------------------- End About section ----------------------- */
+
+/* ----------------------- Stat section ----------------------- */
+
+.statsSpecsWrapper {
+  display: grid;
+  grid-template-columns: 6fr 3fr 19fr;/*5fr 3fr 16fr;*//*5fr 3fr 17fr;*/
+  align-items: center;
+  margin-top: 6px;
+}
+
+#progressBar {
+  grid-column: 3/4;
+}
+
+#statNumber {
+  grid-column: 2/3;
+}
+
+#statText {
+  grid-column: 1/2;
+}
+
+/* ----------------------- End Stat section ----------------------- */
+
+/* ----------------------- Move section ----------------------- */
 
 .boxWrapperMove {
   background-color: white;
@@ -214,27 +312,6 @@ export default {
   padding: 20px 0px 20px 13px;
   box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
   margin-bottom: 30px;
-}
-
-.aboutText {
-  font-size: 14px;
-  color: black;
-}
-
-.specsKey {
-  color: rgba(152,157,159,255); 
-  font-size: 14px;
-}
-
-.specsValue {
-  font-size: 14px;
-}
-
-.aboutPill {
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 11px;
-  color: white;
 }
 
 .movesPill {
@@ -252,4 +329,45 @@ export default {
   grid-column-gap: 0px;
 }
 
+/* ----------------------- End Move section ----------------------- */
+
+.boxWrapper {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
+.heartIcon {
+  float: right; 
+  margin-right: 5px; 
+  color: white; 
+  height: 20px; 
+  width: 20px;
+}
+
+.hqImage {
+  width: 180px; 
+  height: 180px; 
+  display: block; 
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+.specsKey {
+  color: rgba(152,157,159,255); 
+  font-size: 14px;
+}
+
+.specsValue {
+  font-size: 14px;
+}
+
+.sectionTitle {
+  font-weight: bold; 
+  font-size: 12px; 
+  color: white; 
+  margin-bottom: 4px;
+}
 </style>

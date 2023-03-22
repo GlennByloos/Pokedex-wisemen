@@ -24,7 +24,9 @@ import { faVenusMars } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faheartSolid } from '@fortawesome/free-solid-svg-icons'
 import './assets/tailwind.css'
 
+import VueEasyLightbox from 'vue-easy-lightbox/external-css'
+
 /* add icons to the library */
 library.add(faSort, faFilter, faArrowsUpDown, faChevronRight, faHeart, faChevronLeft, faGenderless, faMars, faVenus, faVenusMars, faheartSolid)
 
-createApp(App).component('font-awesome-icon', FontAwesomeIcon).use(store).use(router).mount('#app')
+createApp(App).component('font-awesome-icon', FontAwesomeIcon).use(store).use(router).use(VueEasyLightbox).mount('#app')

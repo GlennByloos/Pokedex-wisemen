@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Pokedex from '../views/Pokedex.vue'
 import PokémonSpecs from "../views/PokémonSpecs.vue"
+import FavPokémon from '../views/FavPokémon.vue'
 
 const routes = [
   {
@@ -9,10 +10,15 @@ const routes = [
     component: Pokedex
   },
   {
-    path: '/pokémonSpecs/:id',
+    path: '/pokemonSpecs/:id',
     name: 'pokémonSpecs',
     component: PokémonSpecs,
     props: true
+  },
+  {
+    path: '/favoritePokemon',
+    name: 'favPokémon',
+    component: FavPokémon
   }
 ]
 
