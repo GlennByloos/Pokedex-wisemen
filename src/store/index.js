@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     pokémonFavList: {},
+    pokémonTeamList: {},
     pokémonList: [],
     bgColor: "#FFFFFF",
     currentPokémon: "",
@@ -35,6 +36,13 @@ export default createStore({
       }
       return false;
     },
+    getTeam(state) {
+      if(state.pokémonTeamList.length == 0) { return false; }
+      for (const team in state.pokémonTeamList) {
+        if(team == state.currentPokémon) { return true; }
+      }
+      return false;
+    },
     getColor(state) {
       return state.bgColor
     },
@@ -45,12 +53,19 @@ export default createStore({
         if (state.pokémonFavList.hasOwnProperty(key)) size++;
       }
       return size;
+    },
+    getLengthTeam(state) {
+      var size = 0,
+        key;
+      for (key in state.pokémonTeamList) {
+        if (state.pokémonTeamList.hasOwnProperty(key)) size++;
+      }
+      return size;
     }
   },
   mutations: {
     addFav(state, val) {
       state.pokémonFavList[val] = val
-      //localStorage.setItem(val, val)
     }, 
     deleteFav(state, val) {
       delete state.pokémonFavList[val]
@@ -63,7 +78,20 @@ export default createStore({
     },
     setPokémonList(state, val) {
       state.pokémonList = val;
-    }
+    },
+    addTeam(state, val) {
+      var size = 0,
+        key;
+      for (key in state.pokémonTeamList) {
+        if (state.pokémonTeamList.hasOwnProperty(key)) size++;
+      }
+      if(size >= 0 && size <= 5) {
+        state.pokémonTeamList[val] = val
+      }
+    }, 
+    deleteTeam(state, val) {
+      delete state.pokémonTeamList[val]
+    },
   },
   actions: {
   },

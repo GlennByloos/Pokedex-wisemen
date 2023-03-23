@@ -7,7 +7,7 @@
     <nav>
       <font-awesome-icon icon="fa-solid fa-chevron-left" style="color: white;"/>
       <!--<router-link to="/" class="navBack"><a style="color: white;">Terug</a></router-link>-->
-      <a style="color: white;" @click="this.$router.go(-1)">Terug</a>
+      <a style="color: white;" class="navBack" @click="this.$router.go(-1)">Terug</a>
       <font-awesome-icon v-if="$store.getters.getFav" @click="$store.commit('deleteFav', pokémon.name)" icon="fa-solid fa-heart" class="heartIcon"/>
       <font-awesome-icon v-else-if="!$store.getters.getFav" @click="$store.commit('addFav', pokémon.name)" icon="fa-regular fa-heart" class="heartIcon"/>
     </nav>
@@ -95,7 +95,7 @@
 
       <!-- ----------------------- Moves section ----------------------- -->
 
-      <div class="elementWrapper">
+      <div class="elementWrapper" style="margin-bottom: 50px;">
         <p class="sectionTitle">MOVESET</p>
         <div class="boxWrapperMove">
             <div class="movesWrapper">
@@ -110,6 +110,14 @@
     </div>
     <!-- ----------------------- end Moves section ----------------------- -->
 
+    <div v-if="!$store.getters.getTeam" @click="$store.commit('addTeam', pokémon.name)" class="container">
+        <div v-if="$store.getters.getLengthTeam < 6" class="inner">Toevoegen aan mijn team</div>
+        <div v-else-if="$store.getters.getLengthTeam >= 6" class="inner" id="disableDiv">Team is vol!!</div>
+    </div>
+    <div v-if="$store.getters.getTeam" @click="$store.commit('deleteTeam', pokémon.name)" class="container">
+        <div class="inner">Verwijderen van mijn team</div>
+    </div>
+    
   </div>
   <!--<router-view />-->
 </template>
@@ -336,7 +344,7 @@ export default {
     display: grid;
     margin-left: auto; 
     margin-right: auto;
-    max-width: 1070px;
+    max-width: 900px;
     grid-template-columns: 1fr 1fr;
   }
 
@@ -425,5 +433,32 @@ export default {
   align-self: left;
   align-self: end;
   grid-gap: 1;
+}
+
+.container {
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  position: fixed;
+  margin: 0 auto;
+}
+
+.inner {
+  max-width: 400px;
+  margin: 0 auto;
+  bottom: 10px;
+  font-size: 18px;
+  width: 92%;
+  background-color: black;
+  color: white; 
+  border-radius: 20px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+#disableDiv {
+  pointer-events: none;
+  opacity: 0.4;
 }
 </style>

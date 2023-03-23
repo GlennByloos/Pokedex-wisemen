@@ -10,11 +10,11 @@
     <input type="text" placeholder="pokemon zoeken" class="searchBar" v-model="search" @input="e => search = e.target.value"/>
 
     <div class="teamFavWrapper">
-      <router-link to="/">
+      <router-link :to="{ name: 'pokémonTeam'}">
         <div class="myTeamWrapper">
           <div></div><div></div>
           <div class="teamFavTitle">Mijn team</div>
-          <div class="teamText">4 pokemons</div>
+          <div class="teamText">{{ $store.getters.getLengthTeam }} pokemons</div>
         </div>
       </router-link>
       <router-link :to="{ name: 'favPokémon' }">
