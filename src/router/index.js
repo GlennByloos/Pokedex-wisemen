@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Pokedex from '../views/Pokedex.vue'
 import PokémonSpecs from "../views/PokémonSpecs.vue"
 import FavPokémon from '../views/FavPokémon.vue'
+import PageNotFound from '../views/PageNotFound.vue'
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/favoritePokemon',
     name: 'favPokémon',
     component: FavPokémon
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: PageNotFound
   }
 ]
 

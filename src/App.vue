@@ -36,9 +36,11 @@ nav {
 
 .whiteTitle {
   margin-top: 10px; 
-  font-size: 32px; 
+  /*font-size: 32px;*/
+  font-size: clamp(32px, 8vw, 50px);
   color: white; 
   font-weight: bold;
+  
 }
 
 </style>

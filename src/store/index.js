@@ -50,7 +50,7 @@ export default createStore({
   mutations: {
     addFav(state, val) {
       state.pokémonFavList[val] = val
-      localStorage.setItem(val, val)
+      //localStorage.setItem(val, val)
     }, 
     deleteFav(state, val) {
       delete state.pokémonFavList[val]

@@ -29,7 +29,7 @@ import PokémonList from "../components/PokémonList.vue"
         return val.name == store.state.pokémonFavList[val.name]
       }
 
-      console.log(store.state.pokémonFavList);
+      //console.log(store.state.pokémonFavList);
 
       const filtered = pokémons.value.filter(favFilter);
 

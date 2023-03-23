@@ -1,5 +1,9 @@
 <template>
-  <div class="font">
+  <div v-if="pokémon.length == 0" >
+    <div style="display: flex; justify-content: center; margin-top: 100px;"><a>loading</a></div>
+    <div style="display: flex; justify-content: center;"><img src="../assets/pokeball.png" style="width: 60px; height: auto;"/></div>
+  </div>
+  <div v-else class="font">
     <nav>
       <font-awesome-icon icon="fa-solid fa-chevron-left" style="color: white;"/>
       <!--<router-link to="/" class="navBack"><a style="color: white;">Terug</a></router-link>-->
@@ -8,95 +12,102 @@
       <font-awesome-icon v-else-if="!$store.getters.getFav" @click="$store.commit('addFav', pokémon.name)" icon="fa-regular fa-heart" class="heartIcon"/>
     </nav>
 
-    <h3 class="whiteTitle">{{ pokémonName }}</h3>
+    <div class="pageWrapper">
 
-    <img :src="imageLink" @click="showSingle" class="hqImage"/>
-    
-    <vue-easy-lightbox
-      :visible="visibleRef"
-      :imgs="imgsRef"
-      :index="indexRef"
-      @hide="onHide"
-    ></vue-easy-lightbox>
-
-    <!-- ----------------------- About section ----------------------- -->
-    
-    <p class="sectionTitle">ABOUT</p>
-
-    <div class="boxWrapper">
-      <div class="aboutText">
-        {{ pokémonAbout }}
+      <div class="elementWrapperTitle">
+        <h3 class="topTitle">{{ pokémonName }}</h3>
       </div>
-      <div v-for="(value, key) in pokémonAboutList" :key="key.value" class="aboutSpecsWrapper">
-        <div class="specsKey">
-          {{ key }}
-        </div>
-        <div v-if="key == 'Type' && value.length == 2">
-          <span :style="{background: $store.state.colours[pokémon.types[1].type.name]}" class="aboutPill">{{ value[1][0].toUpperCase() + value[1].slice(1).toLowerCase() }}</span> <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
-        </div>
-        <div v-else-if="key == 'Type' && value.length == 1">
-          <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
-        </div>
-        <div v-else-if="key != 'Geslacht' && key != 'Type'" class="specsValue">
-          {{ value }}
-        </div>
-        <div v-else-if="value == -1"> <!-- Genderless --> <!-- Gender-rate: The chance of this Pokémon being female, in eighths -->
-          <font-awesome-icon icon="fa-solid fa-genderless" />
-        </div>
-        <div v-else-if="value == 0"> <!-- male -->
-          <font-awesome-icon icon="fa-solid fa-mars" />
-        </div>
-        <div v-else-if="value == 8"> <!-- female -->
-          <font-awesome-icon icon="fa-solid fa-venus" />
-        </div>
-        <div v-else-if="value > 0"> <!-- male/female -->
-          <font-awesome-icon icon="fa-solid fa-venus-mars" />
-        </div>
+
+      <div class="elementWrapper">
+        <img :src="imageLink" @click="showSingle" class="hqImage"/>
+        <vue-easy-lightbox
+          :visible="visibleRef"
+          :imgs="imgsRef"
+          :index="indexRef"
+          @hide="onHide"
+        ></vue-easy-lightbox>
       </div>
-    </div>
-    
-    <!-- ----------------------- end About section ----------------------- -->
-
-    <!-- ----------------------- Stats section ----------------------- -->
-
-    <p class="sectionTitle">STATISTIEKEN</p>
-
-    <div class="boxWrapper">
-      <div v-for="(value, key) in pokémonStatsList" :key="key.value" class="statsSpecsWrapper">
-        <div class="specsKey" id="statText">
-          {{ key }}
-        </div>
-        <div class="specsValue" id="statNumber">
-          {{ value }}
-        </div>
-        <div v-if="key == 'HP' || key == 'Defense' || key == 'Speed'" class="w-full bg-gray-200 rounded-full h-1" id="progressBar">
-          <div v-if="value < 100" class="bg-red-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
-          <div v-else-if="value >= 100" class="bg-red-600 h-1 rounded-full" :style="{width: '100%'}"></div>
-        </div>
-        <div v-if="key == 'Attack' || key == 'Sp. Atk' || key == 'Sp. Def'" class="w-full bg-gray-200 rounded-full h-1" id="progressBar">
-          <div v-if="value < 100" class="bg-green-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
-          <div v-else-if="value >= 100" class="bg-green-600 h-1 rounded-full" :style="{width: '100%'}"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ----------------------- end Stats section ----------------------- -->
-
-    <!-- ----------------------- Moves section ----------------------- -->
-
-    <p class="sectionTitle">MOVESET</p>
-
-    <div class="boxWrapperMove">
-        <div class="movesWrapper">
-          <div v-for="(value, key) in pokémonMovesList" :key="key.value">
-            <div>
-              <span class="movesPill" style="background: rgba(32, 178, 171, 0.25); margin-right: 2px;">Level {{ value }}</span> <span style="font-size: 13px;">{{ key }}</span>
+      <!-- ----------------------- About section ----------------------- -->
+      
+      
+      <div class="elementWrapper">
+        <p class="sectionTitle">ABOUT</p>
+        <div class="boxWrapper">
+          <div class="aboutText">
+            {{ pokémonAbout }}
+          </div>
+          <div v-for="(value, key) in pokémonAboutList" :key="key.value" class="aboutSpecsWrapper">
+            <div class="specsKey">
+              {{ key }}
+            </div>
+            <div v-if="key == 'Type' && value.length == 2">
+              <span :style="{background: $store.state.colours[pokémon.types[1].type.name]}" class="aboutPill">{{ value[1][0].toUpperCase() + value[1].slice(1).toLowerCase() }}</span> <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
+            </div>
+            <div v-else-if="key == 'Type' && value.length == 1">
+              <span :style="{background: $store.state.colours[pokémon.types[0].type.name]}" class="aboutPill">{{ value[0][0].toUpperCase() + value[0].slice(1).toLowerCase() }}</span>
+            </div>
+            <div v-else-if="key != 'Geslacht' && key != 'Type'" class="specsValue">
+              {{ value }}
+            </div>
+            <div v-else-if="value == -1"> <!-- Genderless --> <!-- Gender-rate: The chance of this Pokémon being female, in eighths -->
+              <font-awesome-icon icon="fa-solid fa-genderless" />
+            </div>
+            <div v-else-if="value == 0"> <!-- male -->
+              <font-awesome-icon icon="fa-solid fa-mars" />
+            </div>
+            <div v-else-if="value == 8"> <!-- female -->
+              <font-awesome-icon icon="fa-solid fa-venus" />
+            </div>
+            <div v-else-if="value > 0"> <!-- male/female -->
+              <font-awesome-icon icon="fa-solid fa-venus-mars" />
             </div>
           </div>
         </div>
-    </div>
-    
+      </div>
+      
+      <!-- ----------------------- end About section ----------------------- -->
 
+      <!-- ----------------------- Stats section ----------------------- -->
+
+      <div class="elementWrapper">
+        <p class="sectionTitle">STATISTIEKEN</p>
+        <div class="boxWrapper">
+          <div v-for="(value, key) in pokémonStatsList" :key="key.value" class="statsSpecsWrapper">
+            <div class="specsKey">
+              {{ key }}
+            </div>
+            <div class="specsValue">
+              {{ value }}
+            </div>
+            <div v-if="key == 'HP' || key == 'Defense' || key == 'Speed'" class="w-full bg-gray-200 rounded-full h-1">
+              <div v-if="value < 100" class="bg-red-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+              <div v-else-if="value >= 100" class="bg-red-600 h-1 rounded-full" :style="{width: '100%'}"></div>
+            </div>
+            <div v-if="key == 'Attack' || key == 'Sp. Atk' || key == 'Sp. Def'" class="w-full bg-gray-200 rounded-full h-1">
+              <div v-if="value < 100" class="bg-green-600 h-1 rounded-full" :style="{width: value + '%'}"></div>
+              <div v-else-if="value >= 100" class="bg-green-600 h-1 rounded-full" :style="{width: '100%'}"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----------------------- end Stats section ----------------------- -->
+
+      <!-- ----------------------- Moves section ----------------------- -->
+
+      <div class="elementWrapper">
+        <p class="sectionTitle">MOVESET</p>
+        <div class="boxWrapperMove">
+            <div class="movesWrapper">
+              <div v-for="(value, key) in pokémonMovesList" :key="key.value">
+                <div>
+                  <span class="movesPill" style="background: rgba(32, 178, 171, 0.25); margin-right: 2px;">Level {{ value }}</span> <span style="font-size: 13px;">{{ key }}</span>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
     <!-- ----------------------- end Moves section ----------------------- -->
 
   </div>
@@ -263,8 +274,7 @@ export default {
 .aboutSpecsWrapper {
   display: grid;
   grid-template-columns: 4fr 6fr;
-  justify-items: start;
-  margin-top: 12px
+  margin-top: 12px;
 }
 
 .aboutText {
@@ -290,18 +300,6 @@ export default {
   margin-top: 6px;
 }
 
-#progressBar {
-  grid-column: 3/4;
-}
-
-#statNumber {
-  grid-column: 2/3;
-}
-
-#statText {
-  grid-column: 1/2;
-}
-
 /* ----------------------- End Stat section ----------------------- */
 
 /* ----------------------- Move section ----------------------- */
@@ -312,6 +310,8 @@ export default {
   padding: 20px 0px 20px 13px;
   box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
   margin-bottom: 30px;
+  max-width: 400px;
+  min-width: 300px;
 }
 
 .movesPill {
@@ -331,7 +331,55 @@ export default {
 
 /* ----------------------- End Move section ----------------------- */
 
+@media only screen and (min-width: 840px) {
+  .pageWrapper {
+    display: grid;
+    margin-left: auto; 
+    margin-right: auto;
+    max-width: 1070px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .elementWrapper {
+    display: grid;
+    align-self: start;
+    width: 400px;
+  }
+
+  .elementWrapperTitle {
+    display: grid;
+    justify-items: center;
+    margin-left: auto; 
+    margin-right: auto;
+    width: 400px;
+    grid-column: 1/3;
+  }
+
+  .topTitle {
+    justify-content: center;
+    font-size: clamp(32px, 8vw, 50px);
+    color: white; 
+    font-weight: bold;
+  }
+}
+
+.topTitle {
+  font-size: clamp(32px, 8vw, 50px);
+  color: white; 
+  font-weight: bold;
+}
+
+.elementWrapper {
+  display: grid;
+  margin-left: auto; 
+  margin-right: auto;
+  max-width: 400px;
+  min-width: 300px;
+}
+
 .boxWrapper {
+  max-width: 400px;
+  min-width: 300px;
   background-color: white;
   border-radius: 10px;
   padding: 20px;
@@ -348,8 +396,10 @@ export default {
 }
 
 .hqImage {
-  width: 180px; 
-  height: 180px; 
+  width: 60%;
+  max-width: 340px;
+  min-width: 180px;
+  height: auto;
   display: block; 
   margin-left: auto; 
   margin-right: auto;
@@ -369,5 +419,11 @@ export default {
   font-size: 12px; 
   color: white; 
   margin-bottom: 4px;
+  max-width: 400px;
+  min-width: 300px;
+  width: auto;
+  align-self: left;
+  align-self: end;
+  grid-gap: 1;
 }
 </style>

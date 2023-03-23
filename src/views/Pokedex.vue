@@ -1,6 +1,5 @@
 <template>
   <div class="font">
-
     <nav>
       <img src="../assets/sort-icon.png" class="sortIcon"/>
       <img src="../assets/filter-icon.jpg" class="filterIcon"/>
@@ -26,10 +25,14 @@
       </div>
       </router-link>
     </div>
-
-    <PokémonList :pokémons="matchingNames" />
+    <div v-if="pokémons.length == 0" >
+      <div style="display: flex; justify-content: center; margin-top: 50px;"><a>loading</a></div>
+      <div style="display: flex; justify-content: center;"><img src="../assets/pokeball.png" style="width: 60px; height: auto;"/></div>
+    </div>
+    <div v-else>
+      <PokémonList :pokémons="matchingNames" />
+    </div>
     <router-view />
-
   </div>
 </template>
 
